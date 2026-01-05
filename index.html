@@ -1,1 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pink Calendar Journal</title>
 
+<style>
+body {
+  font-family: "Comic Sans MS", cursive;
+  background: linear-gradient(135deg, #ffd6e8, #ffeaf4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  transition: 0.3s;
+}
+
+body.dark {
+  background: linear-gradient(135deg, #2a1b2d, #3b214a);
+}
+
+.app {
+  background: #fff0f7;
+  width: 360px;
+  padding: 15px;
+  border-radius: 20px;
+  box-shadow: 0 10px 20px rgba(255,105,180,0.3);
+}
+
+body.dark .app {
+  background: #4a2a4f;
+  color: white;
+}
+
+h1 {
+  text-align: center;
+  color: #ff5fa2;
+  margin: 5px 0;
+}
+
+button {
+  border: none;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.toggle {
+  background: #c77dff;
+  color: white;
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-top: 10px;
+}
+
+.day {
+  background: #ffe0ef;
+  text-align: center;
+  padding: 10px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.day.hasEntry {
+  background: #ff9ac7;
+  color: white;
+}
+
+body.dark .day {
+  background: #6a3b73;
+}
+
+.editor {
+  margin-top: 10px;
+}
+
+textarea {
+  width: 100%;
+  height: 70px;
+  border-radius: 10px;
+  border: none;
+  padding: 8px;
+  margin-top: 5px;
+}
+
+.save {
+  background: #ff5fa2;
+  color: white;
+  width: 100%;
+  margin-top: 5px;
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+  <h1>💗 Calendar Journal</h1>
+
+  <button class="toggle" onclick="toggleMode()">🌙 Dark Mode</button>
+
+  <div class="calendar" id="calendar"></div>
+
+  <div class="editor">
+    <strong id="selectedDate">Select a day 💕</strong>
+    <textarea id="entryText" placeholder="Write what’s on your mind..."></textarea>
+    <button class="save" onclick="saveEntry()">Save</button>
+  </div>
+</div>
+
+<script>
+const calendar = document.getElementById("calendar");
+const selectedDateText = document.getElementById("selectedDate");
+const entryText = document.getElementById("entryText");
+
+let selectedDate = null;
+const today = new Date();
+const year = today.getFullYear();
+const month = today.getMonth();
+
+function toggleMode() {
+  document.body.classList.toggle("dark");
+  localStorage.setItem("dark", document.body.classList.contains("dark"));
+}
+
+if (localStorage.getItem("dark") === "true") {
+  document.body.classList.add("dark");
+}
+
+function loadCalendar() {
+  calendar.innerHTML = "";
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateKey = '${year}-${month}-${day}';
+    const div = document.createElement("div");
+    div.className = "day";
+    div.textContent = day;
+
+    if (localStorage.getItem(dateKey)) {
+      div.classList.add("hasEntry");
+    }
+
+    div.onclick = () => selectDay(dateKey);
+    calendar.appendChild(div);
+  }
+}
+
+function selectDay(dateKey) {
+  selectedDate = dateKey;
+  selectedDateText.textContent = '📅 ${dateKey}';
+  entryText.value = localStorage.getItem(dateKey) || "";
+}
+
+function saveEntry() {
+  if (!selectedDate) {
+    alert("Select a day first 💕");
+    return;
+  }
+  localStorage.setItem(selectedDate, entryText.value);
+  loadCalendar();
+}
+
+loadCalendar();
+</script>
+</body>
+</html>
